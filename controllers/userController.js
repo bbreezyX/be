@@ -52,7 +52,9 @@ module.exports = {
       }
 
       // Cari user
-      const user = await User.findOne({ where: { username } });
+      const user = await User.findOne({
+        where: { username: req.body.username },
+      });
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
