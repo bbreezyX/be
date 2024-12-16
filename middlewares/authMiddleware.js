@@ -1,41 +1,14 @@
-// middleware/auth.js
 const jwt = require("jsonwebtoken");
-const User = require("../models/user");
 
-const authMiddleware = async (req, res, next) => {
+exports.authenticateToken = (req, res, next) => {
+  const token = req.headers["authorization"]?.split(" ")[1];
+  if (!token) return res.status(401).json({ message: "Access token required" });
+
   try {
-    const token = req.header("Authorization")?.replace("Bearer ", "");
-
-    if (!token) {
-      return res.status(401).json({
-        success: false,
-        message: "Please authenticate",
-        data: null,
-        error: "No token provided",
-      });
-    }
-
-    // Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-    // Cari user berdasarkan id dari token
-    const user = await User.findByPk(decoded.id);
-
-    if (!user) {
-      throw new Error();
-    }
-
-    // Tambahkan user ke request object
-    req.user = user;
+    req.user = decoded;
     next();
   } catch (error) {
-    res.status(401).json({
-      success: false,
-      message: "Please authenticate",
-      data: null,
-      error: "Invalid token",
-    });
+    res.status(403).json({ message: "Invalid or expired token" });
   }
 };
-
-module.exports = authMiddleware;
