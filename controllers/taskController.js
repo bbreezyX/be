@@ -14,39 +14,31 @@ const { Op } = require("sequelize"); // Untuk operator Sequelize
 // GET task by ID
 exports.getTasks = async (req, res) => {
   try {
-    const { id } = req.params;
-    const task = await Task.findByPk(id);
-    if (!task) return res.status(404).json({ message: "Task not found" });
-    res.status(200).json({ task });
+    const userId = req.user.id;
+    const tasks = await Task.findAll({ where: { creatorId: userId } });
+    res.status(200).json(tasks);
   } catch (error) {
-    res.status(500).json({ message: "Error fetching task", error });
+    res.status(500).json({ error: error.message });
   }
 };
 
-// CREATE new task
 exports.createTask = async (req, res) => {
+  const { title, description, status, priority, assigneeId, dueDate } =
+    req.body;
   try {
-    const {
-      title,
-      description,
-      status,
-      priority,
-      creator_id,
-      assignee_id,
-      due_date,
-    } = req.body;
+    const userId = req.user.id;
     const task = await Task.create({
       title,
       description,
+      creatorId: userId,
+      assigneeId: assigneeId || null,
       status: status || "todo",
       priority: priority || "medium",
-      creator_id,
-      assignee_id,
-      due_date,
+      dueDate: dueDate || null,
     });
     res.status(201).json({ message: "Task created successfully", task });
   } catch (error) {
-    res.status(500).json({ message: "Error creating task", error });
+    res.status(500).json({ error: error.message });
   }
 };
 
