@@ -2,27 +2,45 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
+const expressSwagger = require("express-swagger-generator");
 
 const userRoutes = require("./routes/userRoutes");
 const taskRoutes = require("./routes/taskRoutes");
 
 const app = express();
 
+const expressSwaggerGenerator = expressSwagger(app);
+const options = {
+  swaggerDefinition: {
+    info: {
+      title: "Task API Documentation",
+      version: "1.0.0",
+      description: "Documentation for Task Management API",
+    },
+    host:
+      process.env.NODE_ENV === "production"
+        ? "bebaru.vercel.app"
+        : "localhost:5000",
+    basePath: "/api",
+    schemes: ["https", "http"],
+    securityDefinitions: {
+      JWT: {
+        type: "apiKey",
+        in: "header",
+        name: "Authorization",
+        description: "Bearer token",
+      },
+    },
+  },
+  basedir: __dirname,
+  files: ["./routes/*.js"],
+};
+
+expressSwaggerGenerator(options);
+
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(cors());
-
-const setupSwagger = async () => {
-  try {
-    const swaggerUI = await import("swagger-ui-express");
-    const { default: swaggerDocs } = await import("./config/swagger.js");
-    app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerDocs));
-  } catch (err) {
-    console.log("Swagger documentation is only available in development mode");
-  }
-};
-
-setupSwagger();
 
 app.get("/", (req, res) => {
   res.send("Server is working!");
