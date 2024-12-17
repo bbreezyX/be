@@ -4,6 +4,11 @@ module.exports = (sequelize, DataTypes) => {
   const Task = sequelize.define(
     "Task",
     {
+      id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true, // SERIAL
+      },
       title: {
         type: DataTypes.STRING(255),
         allowNull: false,
@@ -29,6 +34,7 @@ module.exports = (sequelize, DataTypes) => {
           key: "id",
         },
         onDelete: "CASCADE",
+        onUpdate: "NO ACTION",
       },
       assignee_id: {
         type: DataTypes.INTEGER,
@@ -38,33 +44,29 @@ module.exports = (sequelize, DataTypes) => {
           key: "id",
         },
         onDelete: "SET NULL",
+        onUpdate: "NO ACTION",
       },
       due_date: {
         type: DataTypes.DATE,
-      },
-      created_at: {
-        type: DataTypes.DATE,
-        defaultValue: sequelize.literal("CURRENT_TIMESTAMP"),
-      },
-      updated_at: {
-        type: DataTypes.DATE,
-        defaultValue: sequelize.literal("CURRENT_TIMESTAMP"),
+        allowNull: true,
       },
     },
     {
       tableName: "tasks",
-      timestamps: false,
+      timestamps: true,
+      createdAt: "created_at",
+      updatedAt: "updated_at",
     }
   );
 
-  Task.associate = function (models) {
+  Task.associate = (models) => {
     Task.belongsTo(models.User, {
+      as: "creator",
       foreignKey: "creator_id",
-      onDelete: "CASCADE",
     });
     Task.belongsTo(models.User, {
+      as: "assignee",
       foreignKey: "assignee_id",
-      onDelete: "SET NULL",
     });
   };
 
