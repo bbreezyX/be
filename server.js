@@ -2,8 +2,6 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
-const swaggerUI = require("swagger-ui-express");
-const swaggerDocs = require("./config/swagger");
 
 const userRoutes = require("./routes/userRoutes");
 const taskRoutes = require("./routes/taskRoutes");
@@ -14,11 +12,17 @@ app.use(morgan("dev"));
 app.use(express.json());
 app.use(cors());
 
-if (process.env.NODE_ENV !== "production") {
-  const swaggerUI = require("swagger-ui-express");
-  const swaggerDocs = require("./config/swagger");
-  app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerDocs));
-}
+const setupSwagger = async () => {
+  try {
+    const swaggerUI = await import("swagger-ui-express");
+    const { default: swaggerDocs } = await import("./config/swagger.js");
+    app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerDocs));
+  } catch (err) {
+    console.log("Swagger documentation is only available in development mode");
+  }
+};
+
+setupSwagger();
 
 app.get("/", (req, res) => {
   res.send("Server is working!");
