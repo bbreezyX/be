@@ -14,8 +14,11 @@ app.use(morgan("dev"));
 app.use(express.json());
 app.use(cors());
 
-// Swagger setup
-app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerDocs));
+if (process.env.NODE_ENV !== "production") {
+  const swaggerUI = require("swagger-ui-express");
+  const swaggerDocs = require("./config/swagger");
+  app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerDocs));
+}
 
 app.get("/", (req, res) => {
   res.send("Server is working!");
