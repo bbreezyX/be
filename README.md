@@ -23,11 +23,11 @@ Task Management Backend adalah sistem backend yang kuat dan efisien untuk mengel
 
 ## Teknologi yang Digunakan
 
-- **Runtime**: Node.js (>=14.0.0)
-- **Framework**: Express.js 4.21.2
-- **Database**: PostgreSQL (dengan Sequelize 6.37.5)
-- **Autentikasi**: JWT (jsonwebtoken 9.0.2)
-- **Neon**: Platform Database berbasis cloud
+- **Runtime**: Node.js
+- **Framework**: Express.js
+- **Database**: PostgreSQL
+- **Autentikasi**: JWT 
+- **Neon**: Platform Database Berbasis Cloud
 
 ## Prasyarat
 
