@@ -54,6 +54,7 @@ module.exports = {
       // Cari user
       const user = await User.findOne({
         where: { username: req.body.username },
+        attributes: ["id", "username", "nama"], // Spesifik kolom yang diambil
       });
       if (!user) {
         return res.status(404).json({ message: "User not found" });
@@ -72,7 +73,16 @@ module.exports = {
         { expiresIn: "1h" }
       );
 
-      return res.status(200).json({ message: "Login successful", token });
+      // Return user data dan token
+      return res.status(200).json({
+        message: "Login successful",
+        token,
+        user: {
+          id: user.id,
+          username: user.username,
+          nama: user.nama,
+        },
+      });
     } catch (error) {
       return res.status(500).json({ message: error.message });
     }
