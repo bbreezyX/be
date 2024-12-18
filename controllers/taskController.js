@@ -1,11 +1,12 @@
 const { User, Task } = require("../models");
+const { Op } = require("sequelize");
 
 exports.getTasks = async (req, res) => {
   try {
     const userId = req.user.id;
     const tasks = await Task.findAll({
       where: {
-        creator_id: userId,
+        [Op.or]: [{ creator_id: userId }, { assignee_id: userId }],
       },
       include: [
         {
