@@ -39,10 +39,10 @@ module.exports = {
     }
   },
 
-  // Login user
   loginUser: async (req, res) => {
     try {
       const { username, password } = req.body;
+      console.log("Login attempt with:", { username, password });
 
       // Validasi input
       if (!username || !password) {
@@ -53,17 +53,37 @@ module.exports = {
 
       // Cari user
       const user = await User.findOne({
-        where: { username: req.body.username },
-        attributes: ["id", "username", "nama"], // Spesifik kolom yang diambil
+        where: { username },
+        attributes: ["id", "username", "password", "nama"], // Pastikan semua field yang diperlukan
       });
+
+      // Debug log
+      console.log(
+        "Found user:",
+        user
+          ? {
+              id: user.id,
+              username: user.username,
+              hasPassword: !!user.password,
+            }
+          : null
+      );
+
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
 
-      // Cek password
-      const isPasswordValid = await bcrypt.compare(password, user.password);
-      if (!isPasswordValid) {
-        return res.status(401).json({ message: "Invalid password" });
+      // Cek password dengan try-catch untuk menangkap error
+      try {
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        console.log("Password validation result:", isPasswordValid);
+
+        if (!isPasswordValid) {
+          return res.status(401).json({ message: "Invalid password" });
+        }
+      } catch (error) {
+        console.error("Password comparison error:", error);
+        return res.status(500).json({ message: "Error validating password" });
       }
 
       // Generate token JWT
@@ -84,6 +104,7 @@ module.exports = {
         },
       });
     } catch (error) {
+      console.error("Login error:", error);
       return res.status(500).json({ message: error.message });
     }
   },
