@@ -56,19 +56,6 @@ module.exports = {
         where: { username },
         attributes: ["id", "username", "password", "nama"], // Pastikan semua field yang diperlukan
       });
-
-      // Debug log
-      console.log(
-        "Found user:",
-        user
-          ? {
-              id: user.id,
-              username: user.username,
-              hasPassword: !!user.password,
-            }
-          : null
-      );
-
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }

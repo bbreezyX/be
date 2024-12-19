@@ -120,7 +120,6 @@ exports.updateTask = async (req, res) => {
       due_date,
     } = req.body;
 
-    // Cari user berdasarkan username jika ada perubahan assignee
     let new_assignee_id = task.assignee_id;
     if (assignee_username !== undefined) {
       if (assignee_username === null || assignee_username === "") {
